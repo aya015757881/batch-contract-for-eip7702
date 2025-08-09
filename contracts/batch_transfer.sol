@@ -20,7 +20,6 @@ contract BatchCallAndSponsor {
     event CallExecuted(address called_contract);
     /// @notice Emitted when a full batch is executed.
     event BatchExecuted(uint256 indexed nonce, Call[] calls);
-    event FunctionInvoked();
 
     function execute(
         Call[] calldata calls,
@@ -28,8 +27,7 @@ contract BatchCallAndSponsor {
         bytes32 r,
         bytes32 s
     ) external payable {
-        bytes memory stream = abi.encode(calls);
-        bytes32 digest = keccak256(stream);
+        bytes32 digest = keccak256(abi.encode(calls));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
         _executeBatch(calls);
