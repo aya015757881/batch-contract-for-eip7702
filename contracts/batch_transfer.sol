@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 /**
  * @title BatchCallAndSponsor
@@ -33,13 +32,13 @@ contract BatchCallAndSponsor {
     }
 
     /// @notice Emitted for every individual call executed.
-    event CallExecuted(address indexed sender, address indexed to, uint256 value, bytes data);
+    event CallExecuted(address called_contract);
     /// @notice Emitted when a full batch is executed.
     event BatchExecuted(uint256 indexed nonce, Call[] calls);
-    event ToLine(uint32 indexed line);
+    event FunctionInvoked();
 
     function test() external payable {
-        emit ToLine(42);
+        emit FunctionInvoked();
     }
 
     function execute(
@@ -48,11 +47,11 @@ contract BatchCallAndSponsor {
         bytes32 r,
         bytes32 s
     ) external payable {
-        // Compute the digest that the account was expected to sign.
-        bytes memory encodedCalls = abi.encode(calls);
-        bytes32 digest = keccak256(encodedCalls);
-        address recovered = ECDSA.recover(digest, v, r, s);
-        require(recovered == address(this), "Invalid signature");
+        emit FunctionInvoked();
+        bytes memory stream = abi.encode(calls);
+        bytes32 digest = keccak256(stream);
+        address from = ECDSA.recover(digest, v, r, s);
+        require(from == address(this), "Invalid signature");
         _executeBatch(calls);
     }
 
@@ -72,14 +71,14 @@ contract BatchCallAndSponsor {
      * @param calls An array of Call structs.
      */
     function _executeBatch(Call[] calldata calls) internal {
-        uint256 currentNonce = nonce;
-        nonce++; // Increment nonce to protect against replay attacks
+        // uint256 currentNonce = nonce;
+        // nonce++; // Increment nonce to protect against replay attacks
 
         for (uint256 i = 0; i < calls.length; i++) {
             _executeCall(calls[i]);
         }
 
-        emit BatchExecuted(currentNonce, calls);
+        // emit BatchExecuted(currentNonce, calls);
     }
 
     /**
@@ -89,7 +88,7 @@ contract BatchCallAndSponsor {
     function _executeCall(Call calldata callItem) internal {
         (bool success,) = callItem.to.call{value: callItem.value}(callItem.data);
         require(success, "Call reverted");
-        emit CallExecuted(msg.sender, callItem.to, callItem.value, callItem.data);
+        emit CallExecuted(callItem.to);
     }
 
     // Allow the contract to receive ETH (e.g. from DEX swaps or other transfers).
