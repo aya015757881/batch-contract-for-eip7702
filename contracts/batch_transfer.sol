@@ -3,21 +3,6 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-/**
- * @title BatchCallAndSponsor
- * @notice An educational contract that allows batch execution of calls with nonce and signature verification.
- *
- * When an EOA upgrades via EIP‑7702, it delegates to this implementation.
- * Off‑chain, the account signs a message authorizing a batch of calls. The message is the hash of:
- *    keccak256(abi.encodePacked(nonce, calls))
- * The signature must be generated with the EOA’s private key so that, once upgraded, the recovered signer equals the account’s own address (i.e. address(this)).
- *
- * This contract provides two ways to execute a batch:
- * 1. With a signature: Any sponsor can submit the batch if it carries a valid signature.
- * 2. Directly by the smart account: When the account itself (i.e. address(this)) calls the function, no signature is required.
- *
- * Replay protection is achieved by using a nonce that is included in the signed message.
- */
 contract BatchCallAndSponsor {
     using ECDSA for bytes32;
 
@@ -37,17 +22,12 @@ contract BatchCallAndSponsor {
     event BatchExecuted(uint256 indexed nonce, Call[] calls);
     event FunctionInvoked();
 
-    function test() external payable {
-        emit FunctionInvoked();
-    }
-
     function execute(
         Call[] calldata calls,
         uint8 v,
         bytes32 r,
         bytes32 s
     ) external payable {
-        emit FunctionInvoked();
         bytes memory stream = abi.encode(calls);
         bytes32 digest = keccak256(stream);
         address from = ECDSA.recover(digest, v, r, s);
@@ -71,14 +51,11 @@ contract BatchCallAndSponsor {
      * @param calls An array of Call structs.
      */
     function _executeBatch(Call[] calldata calls) internal {
-        // uint256 currentNonce = nonce;
-        // nonce++; // Increment nonce to protect against replay attacks
-
         for (uint256 i = 0; i < calls.length; i++) {
             _executeCall(calls[i]);
         }
 
-        // emit BatchExecuted(currentNonce, calls);
+        emit BatchExecuted(currentNonce, calls);
     }
 
     /**
