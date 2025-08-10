@@ -1,10 +1,16 @@
 
 async function main() {
-  const BatchCallAndSponsor = await ethers.getContractFactory("BatchCallAndSponsor");
-  const batchCallAndSponsor = await BatchCallAndSponsor.deploy();
-  await batchCallAndSponsor.waitForDeployment();
+  const One2ManyTransfer = await ethers.getContractFactory("One2ManyTransfer");
+  const one2ManyTransfer = await One2ManyTransfer.deploy();
+  await one2ManyTransfer.waitForDeployment();
 
-  console.log("BatchCallAndSponsor deployed to:", batchCallAndSponsor.target);
+  console.log("One2ManyTransfer deployed to:", one2ManyTransfer.target);
+
+  const Scheduler = await ethers.getContractFactory("Scheduler");
+  const scheduler = await Scheduler.deploy();
+  await scheduler.waitForDeployment();
+
+  console.log("Scheduler deployed to:", scheduler.target);
 }
 
 main()

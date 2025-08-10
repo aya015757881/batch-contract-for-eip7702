@@ -3,70 +3,44 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract BatchCallAndSponsor {
+contract One2ManyTransfer {
     using ECDSA for bytes32;
 
     /// @notice A nonce used for replay protection.
     uint256 public nonce;
 
-    /// @notice Represents a single call within a batch.
-    struct Call {
+    /// @notice Represents a single transfer within a batch.
+    struct Transfer {
         address to;
         uint256 value;
         bytes data;
     }
 
-    /// @notice Emitted for every individual call executed.
-    event CallExecuted(address called_contract);
-    /// @notice Emitted when a full batch is executed.
-    event BatchExecuted(uint256 indexed nonce, Call[] calls);
+    /// @notice Emitted for every individual transfer executed.
+    event TransferExecuted(address to);
 
-    function execute(
-        Call[] calldata calls,
+    function execute_batch_transfer(
+        Transfer[] calldata transfers,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external payable {
-        bytes32 digest = keccak256(abi.encode(calls));
+    ) external {
+        bytes32 digest = keccak256(abi.encode(transfers));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
-        _executeBatch(calls);
-    }
-
-    /**
-     * @notice Executes a batch of calls directly.
-     * @dev This function is intended for use when the smart account itself (i.e. address(this))
-     * calls the contract. It checks that msg.sender is the contract itself.
-     * @param calls An array of Call structs containing destination, ETH value, and calldata.
-     */
-    function execute(Call[] calldata calls) external payable {
-        require(msg.sender == address(this), "Invalid authority");
-        _executeBatch(calls);
-    }
-
-    /**
-     * @dev Internal function that handles batch execution and nonce incrementation.
-     * @param calls An array of Call structs.
-     */
-    function _executeBatch(Call[] calldata calls) internal {
-        for (uint256 i = 0; i < calls.length; i++) {
-            _executeCall(calls[i]);
+        nonce++; // Increment nonce to protect against replay attacks
+        for (uint256 i = 0; i < transfers.length; i++) {
+            execute_transfer(transfers[i]);
         }
-
-        emit BatchExecuted(currentNonce, calls);
     }
 
     /**
-     * @dev Internal function to execute a single call.
-     * @param callItem The Call struct containing destination, value, and calldata.
+     * @dev Internal function to execute a single transfer.
+     * @param transfer The Transfer struct containing destination, value, and data.
      */
-    function _executeCall(Call calldata callItem) internal {
-        (bool success,) = callItem.to.call{value: callItem.value}(callItem.data);
-        require(success, "Call reverted");
-        emit CallExecuted(callItem.to);
+    function execute_transfer(Transfer calldata transfer) internal {
+        (bool success,) = transfer.to.call{value: transfer.value}(transfer.data);
+        require(success, "Transfer reverted");
+        emit TransferExecuted(transfer.to);
     }
-
-    // Allow the contract to receive ETH (e.g. from DEX swaps or other transfers).
-    fallback() external payable {}
-    receive() external payable {}
 }
