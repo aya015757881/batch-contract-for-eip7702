@@ -6,18 +6,27 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract One2ManyTransfer {
     using ECDSA for bytes32;
 
-    /// @notice A nonce used for replay protection.
+    /// nonce used for replay protection.
     uint256 public nonce;
 
-    /// @notice Represents a single transfer within a batch.
     struct Transfer {
         address to;
         uint256 value;
         bytes data;
     }
 
-    /// @notice Emitted for every individual transfer executed.
     event TransferExecuted(address to);
+
+    constructor() { nonce = 0; }
+
+    function get_nonce() external view returns (uint256) {
+        return nonce;
+    }
+
+    function set_nonce(uint256 _nonce) external {
+        require(msg.sender == address(this), "Access denied");
+        nonce = _nonce;
+    }
 
     function execute_batch_transfer(
         Transfer[] calldata transfers,
@@ -34,10 +43,6 @@ contract One2ManyTransfer {
         }
     }
 
-    /**
-     * @dev Internal function to execute a single transfer.
-     * @param transfer The Transfer struct containing destination, value, and data.
-     */
     function execute_transfer(Transfer calldata transfer) internal {
         (bool success,) = transfer.to.call{value: transfer.value}(transfer.data);
         require(success, "Transfer reverted");
