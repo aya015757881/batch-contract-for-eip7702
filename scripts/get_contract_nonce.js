@@ -1,6 +1,6 @@
 // scripts/get_contract_nonce.js
 async function main() {
-  const contractAddress = "0x6f5ce2e6F2C8D2a6f91FbDeAc835074363c24a6E"; // Replace with your deployed contract address
+  const contractAddress = "0x7eE4c635d204eBE65fc8987CE6570CFA1651E8Af"; // Replace with your deployed contract address
   const One2ManyTransfer = await ethers.getContractFactory("One2ManyTransfer");
   const one2ManyTransfer = One2ManyTransfer.attach(contractAddress);
 
