@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/aya/Projects/batch_transfer/contracts/batch_transfer.sol": {
-      "lastModificationDate": 1755750178110,
-      "contentHash": "614260241dd38cebee1989be3c2584f2",
+      "lastModificationDate": 1755827701374,
+      "contentHash": "47ce297f24f0c0e2aba78412b04e2949",
       "sourceName": "contracts/batch_transfer.sol",
       "solcConfig": {
         "version": "0.8.24",

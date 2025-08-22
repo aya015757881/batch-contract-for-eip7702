@@ -41,4 +41,7 @@ contract One2ManyTransfer {
         require(success, "Transfer reverted");
         emit TransferExecuted(transfer.to);
     }
+
+    receive() external payable {}
+    fallback() external payable {}
 }
