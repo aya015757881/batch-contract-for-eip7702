@@ -6,9 +6,6 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract One2ManyTransfer {
     using ECDSA for bytes32;
 
-    /// nonce used for replay protection.
-    uint256 public nonce;
-
     struct Transfer {
         address to;
         uint256 value;
@@ -27,7 +24,7 @@ contract One2ManyTransfer {
         bytes32 r,
         bytes32 s
     ) external {
-        bytes32 digest = keccak256(abi.encode(nonce, transfers));
+        bytes32 digest = keccak256(abi.encode(transfers));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
         nonce++; // Increment nonce to protect against replay attacks
