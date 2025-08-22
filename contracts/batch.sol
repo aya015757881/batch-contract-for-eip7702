@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract Scheduler {
+contract BatchContract {
     /// @notice Represents a single call within a batch.
     struct Call {
         address to;

@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract One2ManyTransfer {
+contract TransferContract {
     using ECDSA for bytes32;
 
     struct Transfer {
@@ -14,10 +14,6 @@ contract One2ManyTransfer {
 
     event TransferExecuted(address to);
 
-    function get_nonce() external view returns (uint256) {
-        return nonce;
-    }
-
     function execute_batch_transfer(
         Transfer[] calldata transfers,
         uint8 v,
@@ -27,7 +23,6 @@ contract One2ManyTransfer {
         bytes32 digest = keccak256(abi.encode(transfers));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
-        nonce++; // Increment nonce to protect against replay attacks
         for (uint256 i = 0; i < transfers.length; i++) {
             execute_transfer(transfers[i]);
         }

@@ -1,16 +1,16 @@
 
 async function main() {
-  const One2ManyTransfer = await ethers.getContractFactory("One2ManyTransfer");
-  const one2ManyTransfer = await One2ManyTransfer.deploy();
-  await one2ManyTransfer.waitForDeployment();
+  const TransferContract = await ethers.getContractFactory("TransferContract");
+  const transferContract = await TransferContract.deploy();
+  await transferContract.waitForDeployment();
 
-  console.log("One2ManyTransfer deployed to:", one2ManyTransfer.target);
+  console.log("TransferContract deployed to:", transferContract.target);
 
-  const Scheduler = await ethers.getContractFactory("Scheduler");
-  const scheduler = await Scheduler.deploy();
-  await scheduler.waitForDeployment();
+  const BatchContract = await ethers.getContractFactory("BatchContract");
+  const batchContract = await BatchContract.deploy();
+  await batchContract.waitForDeployment();
 
-  console.log("Scheduler deployed to:", scheduler.target);
+  console.log("BatchContract deployed to:", batchContract.target);
 }
 
 main()
