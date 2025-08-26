@@ -76,8 +76,8 @@
       ]
     },
     "/home/aya/Projects/batch_transfer/contracts/transfer.sol": {
-      "lastModificationDate": 1756176325633,
-      "contentHash": "caa8e8df56ad01858ae2120d1a48607c",
+      "lastModificationDate": 1756189896596,
+      "contentHash": "32cf939cd3769471869fadff9473ddf4",
       "sourceName": "contracts/transfer.sol",
       "solcConfig": {
         "version": "0.8.24",

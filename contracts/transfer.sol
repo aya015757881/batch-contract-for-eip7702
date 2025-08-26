@@ -26,7 +26,7 @@ contract TransferContract {
         bytes32 r,
         bytes32 s
     ) external {
-        bytes32 digest = keccak256(abi.encode(transfers));
+        bytes32 digest = keccak256(abi.encode(nonce, transfers));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
         nonce++;
