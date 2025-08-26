@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 contract TransferContract {
     using ECDSA for bytes32;
 
+    uint256 nonce;
+
     struct Transfer {
         address to;
         uint256 value;
@@ -13,6 +15,10 @@ contract TransferContract {
     }
 
     event TransferExecuted(address to);
+
+    function get_nonce() external view returns (uint256) {
+        return nonce;
+    }
 
     function execute_batch_transfer(
         Transfer[] calldata transfers,
@@ -23,6 +29,7 @@ contract TransferContract {
         bytes32 digest = keccak256(abi.encode(transfers));
         address from = ECDSA.recover(digest, v, r, s);
         require(from == address(this), "Invalid signature");
+        nonce++;
         for (uint256 i = 0; i < transfers.length; i++) {
             execute_transfer(transfers[i]);
         }
